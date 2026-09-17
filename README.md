@@ -1,148 +1,168 @@
-Azure Security Learning & Investigation
-1. Identity & Access Management (IAM)
-Overview
+# Azure Security Operations & Threat Hunting Lab
 
-Explored Azure Identity and Access Management using Microsoft Entra ID and Azure Role-Based Access Control (RBAC).
+## Project Overview
 
-Hands-On Activities
-Created and managed Azure Entra ID user accounts.
-Assigned built-in Azure roles based on user responsibilities.
-Reviewed permissions associated with different roles.
-Applied the Principle of Least Privilege (PoLP).
-Configured and reviewed emergency/break-glass access.
-Troubleshot identity and permission-related issues.
-Security Focus
+This project documents hands-on security work completed while learning Microsoft Azure security and monitoring capabilities. The lab connects **Identity and Access Management (IAM), endpoint security, Kusto Query Language (KQL), threat hunting, and threat response** into a practical SOC analyst workflow.
 
-The goal of IAM is to ensure that users and services receive only the access necessary to perform their responsibilities.
+The goal was to build experience investigating security telemetry, identifying anomalous activity, understanding access controls, and documenting investigation findings.
 
-I applied least privilege by evaluating:
+---
 
-User → Job Responsibility → Required Permissions → Appropriate Role
+## Objectives
 
-Key Takeaway
+- Configure and understand Azure Identity and Access Management (IAM).
+- Apply Azure Role-Based Access Control (RBAC) and least privilege.
+- Explore endpoint security and Windows security telemetry.
+- Use KQL to query and analyze security logs.
+- Perform basic threat-hunting investigations.
+- Develop a structured threat-response workflow.
+- Document findings and security observations in a portfolio-ready format.
 
-Improper permissions can increase the impact of a compromised account. Using RBAC and least privilege helps reduce unnecessary access and limit potential security exposure.
+---
 
-2. Kusto Query Language (KQL)
-Overview
+# 1. Identity & Access Management (IAM)
 
-Used Kusto Query Language (KQL) to search, filter, aggregate, and investigate security-related log data within Azure Monitor, Log Analytics, and Microsoft Sentinel.
+## Objective
 
-Skills Practiced
-Filtering events with where
-Sorting results with order by
-Aggregating events with summarize
-Counting events with count()
-Grouping events by IP address
-Working with timestamps
-Using ago() for time-based investigations
-Identifying failed authentication attempts
-Analyzing patterns within security logs
-Example Investigation
+Explore Microsoft Entra ID and Azure RBAC to understand how identities, authentication, authorization, and permissions are managed in Azure.
+
+## Activities
+
+- Created and managed Azure Entra ID user accounts.
+- Assigned built-in Azure roles based on job responsibilities.
+- Reviewed permissions associated with assigned roles.
+- Applied the **Principle of Least Privilege (PoLP)**.
+- Configured and reviewed a break-glass/emergency access account.
+- Troubleshot identity and permission-related issues.
+
+## Security Approach
+
+Role assignments were evaluated using:
+
+**User → Job Responsibility → Required Permissions → Appropriate Role**
+
+The goal was to provide enough access for users to perform their responsibilities without unnecessarily expanding their privileges.
+
+## Security Relevance
+
+Excessive permissions can increase the impact of a compromised account. RBAC and least privilege help reduce unnecessary access and limit potential exposure.
+
+---
+
+# 2. Kusto Query Language (KQL)
+
+## Objective
+
+Use KQL to search, filter, aggregate, and analyze security-related log data.
+
+## Skills Practiced
+
+- `where` — filter events
+- `summarize` — aggregate events
+- `count()` — count activity
+- `order by` — sort results
+- `ago()` — perform time-based searches
+- Group events by IP address
+- Analyze authentication activity
+- Identify patterns in security telemetry
+
+## Example Investigation Query
+
+```kql
 WindowsEvent
 | where EventID == 4625
 | where TimeGenerated > ago(60m)
 | summarize FailureCount = count() by IpAddress, EventID
 | where FailureCount > 3
 | order by FailureCount desc
-Investigation Objective
+```
 
-The query searches for Event ID 4625, which represents failed Windows logon attempts, during the previous 60 minutes.
+## Investigation Objective
 
-The results can help identify IP addresses generating multiple failed authentication attempts that may warrant additional investigation.
+This query searches for **Event ID 4625**, representing failed Windows logon attempts, during the previous 60 minutes.
 
-SOC Relevance
+The results can help identify IP addresses associated with multiple failed authentication attempts that may warrant additional investigation.
 
-KQL allows analysts to move from:
+## SOC Relevance
 
-Raw Logs → Relevant Events → Patterns → Investigation
+KQL helps transform large volumes of raw telemetry into actionable investigation data:
 
-rather than manually reviewing large volumes of log data.
+**Raw Logs → Relevant Events → Patterns → Investigation**
 
-3. Endpoint Security
-Overview
+---
 
-Explored endpoint security concepts related to protecting and monitoring Windows systems within an Azure environment.
+# 3. Endpoint Security
 
-Areas Covered
-Windows Server security
-Endpoint visibility
-Security event logging
-Authentication monitoring
-Administrative access
-Network security controls
-Windows Admin Center
-Microsoft Defender for Cloud
-Hands-On Activities
-Connected to and managed a Windows Server environment.
-Reviewed Windows security events.
-Investigated authentication activity.
-Configured Network Security Group rules.
-Troubleshot Windows Admin Center access and permissions.
-Reviewed security recommendations through Defender for Cloud.
-Security Focus
+## Objective
 
-Endpoints can provide valuable evidence during a security investigation.
+Explore endpoint security concepts using Windows systems and Azure security services.
 
-Important endpoint data can include:
+## Activities
 
-Login activity
-Failed authentication
-Process activity
-Network connections
-Administrative activity
-Security events
-Key Takeaway
+- Connected to and managed a Windows Server environment.
+- Reviewed Windows security events.
+- Investigated authentication activity.
+- Configured Network Security Group (NSG) rules.
+- Troubleshot Windows Admin Center access and permissions.
+- Reviewed security recommendations through Microsoft Defender for Cloud.
 
-Effective endpoint security requires both preventive controls and visibility so that suspicious activity can be detected and investigated.
+## Endpoint Telemetry
 
-4. Threat Hunting
-Overview
+Security investigations can use endpoint data such as:
 
-Practiced the fundamentals of threat hunting by using KQL to search Azure logs for unusual or potentially suspicious activity.
+- Login activity
+- Failed authentication attempts
+- Process activity
+- Network connections
+- Administrative activity
+- Windows security events
 
-Instead of waiting for an alert, threat hunting involves proactively searching available telemetry for indicators of abnormal behavior.
+## Security Relevance
 
-Hunting Process
+Endpoints provide valuable evidence during security investigations. Effective endpoint security combines preventive controls with visibility into system activity.
 
-1. Establish a Baseline
+---
 
-Understand what normal activity looks like.
+# 4. Threat Hunting
 
-↓
+## Objective
 
-2. Develop a Hypothesis
+Practice proactive threat hunting by using KQL to search security telemetry for unusual or potentially suspicious behavior.
+
+## Hunting Methodology
+
+### 1. Establish a Baseline
+
+Understand what normal activity looks like within the environment.
+
+### 2. Develop a Hypothesis
 
 Example:
 
-Could repeated failed authentication attempts indicate brute-force or password-spraying activity?
+> Could repeated failed authentication attempts indicate brute-force or password-spraying behavior?
 
-↓
-
-3. Query the Data
+### 3. Query the Data
 
 Use KQL to search relevant logs.
 
-↓
-
-4. Identify Anomalies
+### 4. Identify Anomalies
 
 Look for:
 
-Repeated authentication failures
-Unusual IP addresses
-Multiple accounts targeted by one source
-Unusual login times
-Unexpected geographic locations
-Abnormal activity patterns
+- Repeated authentication failures
+- Unusual source IP addresses
+- Multiple accounts targeted by one source
+- Unusual login times
+- Unexpected geographic locations
+- Abnormal behavior patterns
 
-↓
+### 5. Investigate
 
-5. Investigate
+Correlate events and gather additional evidence before determining whether the activity requires escalation.
 
-Correlate events and gather additional evidence.
+## Example Hunting Query
 
-Example Hunting Query
+```kql
 SigninLogs
 | where ResultType != 0
 | summarize
@@ -152,87 +172,203 @@ SigninLogs
     LastAttempt = max(TimeGenerated)
     by IPAddress
 | order by FailedAttempts desc
-Security Focus
+```
 
-The purpose of this type of investigation isn't to automatically label an IP as malicious. Instead, it identifies anomalous behavior that deserves further investigation.
+## Hunting Principle
 
-5. Threat Response
-Overview
+An unusual event is not automatically malicious. The objective is to identify activity that is sufficiently anomalous to justify additional investigation.
 
-Explored the fundamentals of responding to potentially suspicious security activity after detection.
+---
 
-Response Workflow
+# 5. Threat Response
 
-Identify → Validate → Investigate → Contain → Remediate → Monitor → Document
+## Objective
 
-1. Identify
+Develop a structured approach for responding to potentially suspicious security activity.
+
+## Response Workflow
+
+**Identify → Validate → Investigate → Contain → Remediate → Monitor → Document**
+
+### Identify
 
 Determine what triggered the investigation.
 
 Example:
 
-Multiple failed authentication attempts from the same IP address.
+> Multiple failed authentication attempts were observed from the same source IP.
 
-2. Validate
+### Validate
 
 Determine whether the activity is:
 
-Expected
-Benign
-Suspicious
-Potentially malicious
-3. Investigate
+- Expected
+- Benign
+- Suspicious
+- Potentially malicious
 
-Collect additional information such as:
+### Investigate
 
-Source IP
-Targeted account
-Timestamp
-Number of attempts
-Authentication results
-Geographic information
-Related events
-4. Contain
+Collect supporting information:
 
-Depending on the investigation and organizational procedures, potential containment actions could include:
+- Source IP
+- Targeted account
+- Timestamp
+- Number of attempts
+- Authentication results
+- Geographic information
+- Related events
 
-Restricting suspicious network traffic
-Disabling or securing compromised accounts
-Revoking sessions/tokens
-Increasing monitoring
-Applying appropriate access controls
-5. Remediate
+### Contain
 
-Address the underlying issue and restore the environment to a secure state.
+Depending on organizational procedures and investigation findings, potential containment actions may include:
 
-6. Monitor
+- Restricting suspicious network traffic
+- Securing or disabling compromised accounts
+- Revoking sessions or tokens
+- Increasing monitoring
+- Applying appropriate access controls
 
-Continue monitoring for recurring activity or additional indicators of compromise.
+### Remediate
 
-7. Document
+Address the underlying security issue and restore the environment to an appropriate secure state.
+
+### Monitor
+
+Continue monitoring for recurring activity or additional indicators.
+
+### Document
 
 Record:
 
-What happened
-Evidence collected
-KQL queries used
-Actions taken
-Investigation results
-Lessons learned
-Skills Demonstrated
-Category	Skills
-IAM	Entra ID, RBAC, Least Privilege, Access Control
-KQL	Log Querying, Filtering, Aggregation, Event Analysis
-Endpoint	Windows Server, Security Events, Endpoint Monitoring
-Threat Hunting	Hypothesis Development, Anomaly Detection, Log Analysis
-Threat Response	Investigation, Containment, Remediation, Documentation
-Azure Security	Sentinel, Log Analytics, Defender for Cloud, Azure Monitor, NSGs
-Overall Learning Outcome
+- What happened
+- Evidence collected
+- Queries used
+- Actions taken
+- Investigation results
+- Lessons learned
 
-This portion of the Azure course helped me connect identity, endpoint security, logging, threat hunting, and incident response into a practical security workflow.
+---
 
-Rather than treating each technology independently, I practiced using Azure security telemetry to investigate activity, identify anomalies, analyze potential threats, and document findings using a SOC analyst-style approach.
+# Investigation Workflow
 
-Core workflow:
+The concepts covered in this project were connected into a SOC-style workflow:
 
-IAM → Endpoint → Logs → KQL → Threat Hunting → Investigation → Response → Documentation
+```text
+IAM
+ ↓
+Endpoint
+ ↓
+Security Logs
+ ↓
+KQL Analysis
+ ↓
+Threat Hunting
+ ↓
+Investigation
+ ↓
+Threat Response
+ ↓
+Documentation
+```
+
+This workflow demonstrates how security analysts can move from raw telemetry toward evidence-based investigation and response.
+
+---
+
+# Tools & Technologies
+
+| Category | Technologies |
+|---|---|
+| Cloud Platform | Microsoft Azure |
+| Identity | Microsoft Entra ID |
+| Access Control | Azure RBAC |
+| SIEM | Microsoft Sentinel |
+| Log Management | Azure Log Analytics |
+| Query Language | Kusto Query Language (KQL) |
+| Endpoint | Windows Server |
+| Cloud Security | Microsoft Defender for Cloud |
+| Monitoring | Azure Monitor |
+| Network Security | Network Security Groups |
+| Administration | Windows Admin Center |
+
+---
+
+# Skills Demonstrated
+
+### Identity & Access Management
+- Microsoft Entra ID
+- Azure RBAC
+- Least Privilege
+- Access Control
+
+### Security Monitoring
+- Log Collection
+- Security Event Analysis
+- Authentication Monitoring
+- Azure Monitor
+- Microsoft Sentinel
+
+### Threat Hunting
+- Hypothesis Development
+- KQL Querying
+- Anomaly Detection
+- IP Address Analysis
+- Authentication Analysis
+- Behavioral Analysis
+
+### Threat Response
+- Alert Validation
+- Investigation
+- Containment Concepts
+- Remediation Concepts
+- Security Documentation
+
+---
+
+# Lessons Learned
+
+This project helped connect individual Azure security technologies into a broader security operations workflow.
+
+One of the most valuable areas was learning how to use **KQL to move from raw log data toward an investigation**. Instead of reviewing events individually, I practiced filtering telemetry, identifying repeated activity, grouping events by source IP, and looking for behavioral patterns.
+
+The project also reinforced the importance of:
+
+- Least privilege
+- Centralized logging
+- Endpoint visibility
+- Continuous monitoring
+- Evidence-based investigation
+- Clear security documentation
+
+A key lesson from the troubleshooting process was that a technically correct query can still return no results if the workspace does not contain the expected table, columns, or telemetry. Understanding the available data is therefore an important first step in a real investigation.
+
+---
+
+# Future Improvements
+
+Future iterations of this project could include:
+
+- Creating custom Microsoft Sentinel analytics rules.
+- Building Sentinel workbooks and dashboards.
+- Creating automated response playbooks.
+- Developing additional KQL threat-hunting queries.
+- Investigating PowerShell and process-based activity.
+- Integrating additional data sources.
+- Documenting false positives and detection tuning.
+- Creating simulated incidents and documenting complete incident-response cases.
+
+---
+
+## Disclaimer
+
+This repository documents educational lab work performed in a controlled Azure environment. IP addresses, usernames, and other potentially identifying values should be sanitized before publishing screenshots or investigation results.
+
+---
+
+## Author
+
+**Cybersecurity Professional**
+
+Focus areas: Azure Security | SOC Operations | Threat Hunting | SIEM | KQL | Incident Response
+
