@@ -27,6 +27,9 @@ The accounts included:
 - Jasmine HR
 - Logan Security
 
+<img width="1280" height="401" alt="Screenshot 2026-10-20 201805" src="https://github.com/user-attachments/assets/16662a5b-a36c-4fb4-9f0a-760f094e32af" />
+
+
 ## Least-Privilege RBAC
 
 I Assigned Azure roles based on each user's job responsibilities:
