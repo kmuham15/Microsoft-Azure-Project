@@ -67,6 +67,13 @@ Onboarding Status:
 
   <img width="1196" height="755" alt="05-mde-onboarding" src="https://github.com/user-attachments/assets/35f6554d-c9dd-448f-add2-350a8af1f3aa" />
 
+  ### Shellcode Injection Result
+
+Following the controlled attack simulation, the lab confirmed that shellcode was successfully injected into a running process.
+
+This demonstrated suspicious process activity that Microsoft Defender for Endpoint could identify and flag for further investigation.
+
+
  ## Controlled PowerShell Attack Simulation
 
  Established a Remote Desktop connection to the Windows Server and executed a controlled PowerShell attack simulation to generate suspicious endpoint activity for detection and analysis using Microsoft Defender for Endpoint.
@@ -79,7 +86,7 @@ Command used:
 
 <img width="1103" height="656" alt="06-attack-script-execution" src="https://github.com/user-attachments/assets/38ba20ab-970b-4043-8d5c-da44a95bf67a" />
 
-##KQL Failed Logon Analysis
+## KQL Failed Logon Analysis
 
 Utilized Kusto Query Language (KQL) in Azure Log Analytics to analyze failed Windows authentication attempts, identify suspicious login activity, and investigate potential security threats.
 
